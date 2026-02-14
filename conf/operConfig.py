@@ -18,7 +18,7 @@ class OperConfig:
 
     def get_section_data(self, section, option):
         """
-
+        根据section和option获取ini文件中的值
         :param section: ini文件头部
         :param option: 头部值
         :return:

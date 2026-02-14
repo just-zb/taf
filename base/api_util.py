@@ -12,6 +12,14 @@ class RequestBase:
         return data
 
     def specification_yaml(self, base_info, test_case):
+        """
+            1. 替换yaml文件中的参数
+            2. 发送接口请求
+            3. 处理接口响应信息
+        :param base_info:
+        :param test_case:
+        :return:
+        """
         try:
             params_type = ['data', 'json', 'params']
 

@@ -19,14 +19,14 @@ class SendRequest:
 
     def run(self,name, url, case_name, header, method, cookies=None, **kwargs):
         """
-        接口请求
+        接口请求,日志记录接口请求信息
         :param name: 接口名
         :param url: 接口地址
         :param case_name: 测试用例
         :param header:请求头
         :param method:请求方法
         :param cookies：默认为空
-        :param kwargs: 请求参数，根据yaml文件的参数类型
+        :param kwargs: 请求参数，根据yaml文件的参数类型,可能包含data、json、params等参数
         :return:
         """
         try:

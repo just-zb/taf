@@ -11,6 +11,10 @@ logfile_name = log_path + r"\test.{}.logs".format(time.strftime("%Y%m%d"))
 
 
 def get_log():
+    """
+        获取日志记录器
+    :return: 日志记录器对象
+    """
     logger = logging.getLogger(__name__)
     if not logger.handlers:
         logger.setLevel(setting.LOG_LEVEL)

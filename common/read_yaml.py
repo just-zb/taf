@@ -4,6 +4,11 @@ from common.recordlog import logs
 
 
 def get_test_case_yaml(file_path):
+    """
+        读取yaml文件中的测试用例数据
+    :param file_path: yaml文件路径
+    :return: 包含测试用例数据的列表，每个元素是一个包含base_info和test_case的列表
+    """
     test_case_list = []
     try:
         with open(file_path,'r', encoding='utf-8') as f:
