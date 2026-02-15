@@ -1,5 +1,8 @@
 import json
+import re
 from json import JSONDecodeError
+
+import jsonpath
 
 from common.assertions import Assertions
 from common.debug_talk import DebugTalk
@@ -122,7 +125,37 @@ class RequestBase:
             raise e
 
     def extract_data(self, test_case_extract, response):
-        pass
+        """
+        提取接口的响应参数,支持正则表达式和json提取, 提取的数据会写入extract.yaml文件中，供后续接口调用
+        :param test_case_extract: testcase文件yaml中的extract值
+        :param response: 接口的实际返回值
+        :return:
+        """
+        try:
+            pattern_lst = ['(.*?)', '(.+?)', r'(\d)', r'(\d*)']
+            for key, value in test_case_extract.items():
 
+                for pat in pattern_lst:
+                    if pat in value:
+                        ext_lst = re.search(value, response)
+                        if pat in [r'(\d+)', r'(\d*)']:
+                            extract_data = {key: int(ext_lst.group(1))}
+                        else:
+                            extract_data = {key: ext_lst.group(1)}
+                        self.read.write_extract_yaml(extract_data)
+                # 处理json提取器
+                if '$' in value:
+                    ext_json = jsonpath.jsonpath(json.loads(response),value)[0]
+                    if ext_json:
+                        extract_data = {key: ext_json}
+                        logs.info('提取接口的返回值：%s' % extract_data)
+                    else:
+                        extract_data = {key: '未提取到数据，请检查接口返回值是否为空！'}
+                        logs.error('未提取到数据，请检查接口返回值是否为空！')
+                    # 将提取到的数据写入extract.yaml文件中
+                    self.read.write_extract_yaml(extract_data)
+        except Exception as e:
+            logs.error(str(e))
+            raise e
     def extract_data_list(self, testcase_extract_list, response):
         pass

@@ -56,5 +56,9 @@ class ReadYaml:
         except Exception as e:
             logs.error(f"[extract.yaml]没有找到：{node_name},--%s" % e)
 
+    @staticmethod
+    def write_extract_yaml(value):
+        pass
+
 
 
