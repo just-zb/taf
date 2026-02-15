@@ -1,5 +1,6 @@
 import json
 
+import allure
 import pytest
 import requests
 
@@ -61,12 +62,15 @@ class SendRequest:
             logs.info('Cookie：%s' % cookies)
             req_params = json.dumps(kwargs, ensure_ascii=False)
 
-            # TODO 记录allure和日志
+
             if 'data' in kwargs.keys():
+                allure.attach(req_params, "data类型请求参数", allure.attachment_type.TEXT)
                 logs.info("请求参数：%s" % kwargs)
             elif 'json' in kwargs.keys():
+                allure.attach(req_params, "json类型请求参数", allure.attachment_type.TEXT)
                 logs.info("请求参数：%s" % kwargs)
             elif 'params' in kwargs.keys():
+                allure.attach(req_params, "params类型请求参数", allure.attachment_type.TEXT)
                 logs.info("请求参数：%s" % kwargs)
         except Exception as e:
             logs.error(e)

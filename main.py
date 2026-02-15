@@ -13,4 +13,4 @@ if __name__ == '__main__':
             '--clean-alluredir' # 在生成allure报告数据之前清空指定目录中的旧数据
         ]
     )
-    # os.system('allure serve ./report/temp')
+    os.system('allure serve ./report/temp')

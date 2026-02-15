@@ -26,7 +26,6 @@ def start_test_and_end():
 
 @pytest.fixture(scope='session', autouse=True)
 def system_login():
-    print('登录系统')
     try:
         api_info = ReadYaml.read_test_case_yaml(PRJ_DIR / "data/loginName.yaml")
         RequestBase().specification_yaml(api_info[0][0], api_info[0][1])

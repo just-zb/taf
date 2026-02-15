@@ -1,3 +1,4 @@
+import allure
 import jsonpath
 
 from common.recordlog import logs
@@ -15,7 +16,7 @@ class Assertions:
             if a_key == "status_code":
                 if a_value != status_code:
                     flag += 1
-                    # TODO add allure
+                    allure.attach(f"预期结果：{a_value}\n实际结果：{status_code}", '响应代码断言结果:失败',attachment_type=allure.attachment_type.TEXT)
                     logs.error("contains断言失败：接口返回码【%s】不等于【%s】" % (status_code, a_value))
             else:
                 resp_list = jsonpath.jsonpath(response, "$..%s" % a_key)
@@ -27,7 +28,8 @@ class Assertions:
                         logs.info("字符串包含断言成功：预期结果【%s】,实际结果【%s】" % (a_value, resp_list))
                     else:
                         flag += 1
-                        # TODO add allure
+                        allure.attach(f"预期结果：{a_value}\n实际结果：{resp_list}", '响应文本断言结果：失败',
+                                      attachment_type=allure.attachment_type.TEXT)
                         logs.error("响应文本断言失败：预期结果为【%s】,实际结果为【%s】" % (a_value, resp_list))
         return flag
 

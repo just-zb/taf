@@ -2,6 +2,7 @@ import json
 import re
 from json import JSONDecodeError
 
+import allure
 import jsonpath
 
 from common.assertions import Assertions
@@ -69,12 +70,16 @@ class RequestBase:
         try:
             params_type = ['data', 'json', 'params']
 
-            # TODO add allure
+            api_name = base_info['api_name']
             url_host = self.conf.get_section_data('api_env', 'host')
             url = url_host + base_info['url']
-            api_name = base_info['api_name']
             method = base_info['method']
             header = self.replace_load(base_info['header'])
+            # allure attach
+            allure.attach(api_name, f'接口地址：{url}', allure.attachment_type.TEXT)
+            allure.attach(api_name, f'接口名称：{api_name}', allure.attachment_type.TEXT)
+            allure.attach(api_name, f'请求方法：{method}', allure.attachment_type.TEXT)
+            allure.attach(api_name, f'请求头：{header}', allure.attachment_type.TEXT)
             # handle cookies
             cookies = None
             if base_info.get('cookies') is not None:
@@ -82,7 +87,7 @@ class RequestBase:
 
             # test_case 是一个字典，包含了名称,数据,验证方法等信息
             case_name = test_case.pop('case_name')
-
+            allure.attach(api_name, f'测试用例名称：{case_name}', allure.attachment_type.TEXT)
             # validation 替换
             test_case['validation'] = self.replace_load(test_case.get('validation'))
             validation = eval(test_case.pop('validation'))
@@ -107,6 +112,7 @@ class RequestBase:
                                )
 
             # 处理接口响应信息
+            allure.attach(json.dumps(res.json(), ensure_ascii=False, indent=2), '接口响应信息', allure.attachment_type.JSON)
             try:
                 res_json = json.loads(res.text)
                 if extract is not None:
