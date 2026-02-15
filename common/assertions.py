@@ -7,22 +7,22 @@ class Assertions:
     """
     def contains_assert(self,value, response, status_code):
         # TODO
-        pass
+        return 0
     def equals_assert(self,value, response):
-        pass
+        return 0
     def not_equals_assert(self,value, response):
-        pass
+        return 0
     def assert_result(self, expected, response, status_code):
         try:
             logs.info("yaml文件预期结果：%s" % expected)
             total_flag = 0
             for yq in expected:
                 for key, value in yq.items():
-                    if key.equals("contains"):
+                    if key == "contains":
                         total_flag += self.contains_assert(value, response, status_code)
-                    elif key.equals("eq"):
+                    elif key == "eq":
                         total_flag += self.equals_assert(value, response)
-                    elif key.equals('ne'):
+                    elif key == "ne":
                         total_flag += self.not_equals_assert(value, response)
                     else:
                         logs.error("不支持此种断言方式")
