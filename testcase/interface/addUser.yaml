@@ -16,4 +16,4 @@
         - contains:
             { 'status_code': 200 }
         - contains:
-            { 'msg': '新增成功' }
+            { 'msg': 'add success' }

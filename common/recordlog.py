@@ -5,9 +5,8 @@ import os
 from conf import setting
 
 log_path = setting.FILE_PATH["LOG"]
-if not os.path.exists(log_path):
-    os.mkdir(log_path)
-logfile_name = log_path + r"\test.{}.logs".format(time.strftime("%Y%m%d"))
+log_path.mkdir(parents=True, exist_ok=True)
+logfile_name = log_path / r"\test.{}.logs".format(time.strftime("%Y%m%d"))
 
 
 def get_log():

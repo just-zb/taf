@@ -1,5 +1,8 @@
 import json
 
+import pytest
+import requests
+
 from common.recordlog import logs
 from conf import setting
 
@@ -15,7 +18,26 @@ class SendRequest:
         pass
 
     def request(self, **kwargs):
-        pass
+        session = requests.session()
+        result = None
+        cookie = {}
+        try:
+            result = session.request(**kwargs)
+            set_cookie = requests.utils.dict_from_cookiejar(result.cookies)
+            if set_cookie:
+                cookie['Cookie'] = set_cookie
+                # cookie 写入yaml文件供后续使用
+                logs.info("cookie：%s" % cookie)
+            logs.info("接口返回信息：%s" % result.text if result.text else result)
+        except requests.exceptions.ConnectionError:
+            logs.error("ConnectionError--连接异常")
+            pytest.fail("接口请求异常，可能是request的连接数过多或请求速度过快导致程序报错！")
+        except requests.exceptions.HTTPError:
+            logs.error("HTTPError--http异常")
+        except requests.exceptions.RequestException as e:
+            logs.error(e)
+            pytest.fail("请求异常，请检查系统或数据是否正常！")
+        return result
 
     def run(self,name, url, case_name, header, method, cookies=None, **kwargs):
         """
@@ -38,6 +60,7 @@ class SendRequest:
             logs.info('Cookie：%s' % cookies)
             req_params = json.dumps(kwargs, ensure_ascii=False)
 
+            # TODO 记录allure和日志
             if 'data' in kwargs.keys():
                 logs.info("请求参数：%s" % kwargs)
             elif 'json' in kwargs.keys():

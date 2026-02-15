@@ -3,6 +3,10 @@ import yaml
 from common.recordlog import logs
 
 
+class ReadYaml:
+    pass
+
+
 def get_test_case_yaml(file_path):
     """
         读取yaml文件中的测试用例数据
@@ -11,14 +15,12 @@ def get_test_case_yaml(file_path):
     """
     test_case_list = []
     try:
-        with open(file_path,'r', encoding='utf-8') as f:
+        with open(file_path, encoding='utf-8') as f:
             data = yaml.safe_load(f)
-            if len(data) == 0:
-                return None
-            if len(data) == 1:
-                yam_data = data[0]
-                base_info = yam_data.get('baseInfo')
-                for ts in yam_data.get('testCase'):
+            if len(data) <= 1:
+                yaml_data = data[0]
+                base_info = yaml_data.get('baseInfo')
+                for ts in yaml_data.get('testCase'):
                     param = [base_info, ts]
                     test_case_list.append(param)
                 return test_case_list
