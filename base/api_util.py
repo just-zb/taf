@@ -113,7 +113,7 @@ class RequestBase:
                 if extract_list is not None:
                     self.extract_data_list(extract_list, res.text)
                 # 处理断言
-                self.asserts.assert_result(validation, res.text, res.status_code)
+                self.asserts.assert_result(validation, json.loads(res.text), res.status_code)
             except JSONDecodeError as je:
                 logs.error('系统异常或接口未请求！')
                 raise je
