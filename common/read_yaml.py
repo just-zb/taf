@@ -1,4 +1,5 @@
 import os
+import traceback
 
 import yaml
 
@@ -58,7 +59,16 @@ class ReadYaml:
 
     @staticmethod
     def write_extract_yaml(value):
-        pass
+        file_path = FILE_PATH['EXTRACT']
+        try:
+            with open(file_path, 'a', encoding='utf-8') as f:
+                if isinstance(value, dict):
+                    data = yaml.dump(value, allow_unicode=True, sort_keys=False)
+                    f.write(data)
+                else:
+                    logs.info('写入[extract.yaml]的数据必须为dict格式')
+        except Exception:
+            logs.error(str(traceback.format_exc()))
 
 
 
