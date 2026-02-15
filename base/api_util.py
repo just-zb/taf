@@ -1,8 +1,10 @@
 import json
+from json import JSONDecodeError
 
 from common.assertions import Assertions
 from common.debug_talk import DebugTalk
 from common.read_yaml import ReadYaml
+from common.recordlog import logs
 from common.send_request import SendRequest
 from conf.oper_config import OperConfig
 
@@ -70,6 +72,7 @@ class RequestBase:
             api_name = base_info['api_name']
             method = base_info['method']
             header = self.replace_load(base_info['header'])
+            # handle cookies
             cookies = None
             if base_info.get('cookies') is not None:
                 cookies = eval(self.replace_load(base_info['cookies']))
@@ -77,12 +80,11 @@ class RequestBase:
             # test_case 是一个字典，包含了名称,数据,验证方法等信息
             case_name = test_case.pop('case_name')
 
-            # 替换yaml文件中的参数，可能包含请求参数、验证方法、提取数据等参数
-            # TODO add validation
-            # test_case['validation'] = self.replace_load(test_case.get('validation'))
-            # validation = eval(test_case.pop('validation'))
-            test_case.pop('validation')
+            # validation 替换
+            test_case['validation'] = self.replace_load(test_case.get('validation'))
+            validation = eval(test_case.pop('validation'))
 
+            # 从接口响应中提取参数
             extract = test_case.pop('extract', None)
             extract_list = test_case.pop('extract_list', None)
 
@@ -90,8 +92,6 @@ class RequestBase:
             for k, v in test_case.items():
                 if k in params_type:
                     test_case[k] = self.replace_load(v)
-
-            # TODO 文件上传
 
             # 发送接口请求
             res = self.run.run(name=api_name,
@@ -103,7 +103,20 @@ class RequestBase:
                                **test_case
                                )
 
-            # TODO 处理接口响应信息
+            # 处理接口响应信息
+            try:
+                if extract is not None:
+                    self.extract_data(extract, res.text)
+                if extract_list is not None:
+                    self.extract_data_list(extract_list, res.text)
+                # 处理断言
+                self.asserts.assert_result(validation, res.text, res.status_code)
+            except JSONDecodeError as je:
+                logs.error('系统异常或接口未请求！')
+                raise je
+            except Exception as e:
+                logs.error(e)
+                raise e
 
         except Exception as e:
             raise e
