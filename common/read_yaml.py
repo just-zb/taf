@@ -61,7 +61,7 @@ class ReadYaml:
     def write_extract_yaml(value):
         file_path = FILE_PATH['EXTRACT']
         try:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, 'a', encoding='utf-8') as f:
                 if isinstance(value, dict):
                     data = yaml.dump(value, allow_unicode=True, sort_keys=False)
                     f.write(data)
@@ -69,6 +69,15 @@ class ReadYaml:
                     logs.info('写入[extract.yaml]的数据必须为dict格式')
         except Exception:
             logs.error(str(traceback.format_exc()))
+
+    @staticmethod
+    def clear_extract_yaml():
+        """
+        清空extract.yaml文件数据
+        :return:
+        """
+        with open(FILE_PATH['EXTRACT'], 'w', encoding='utf-8') as f:
+            f.truncate()
 
 
 
