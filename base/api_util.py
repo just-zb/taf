@@ -145,6 +145,7 @@ class RequestBase:
                         self.read.write_extract_yaml(extract_data)
                 # 处理json提取器
                 if '$' in value:
+                    # $.data.user_token能够被jsonpath识别, 提取接口返回值中的user_token
                     ext_json = jsonpath.jsonpath(json.loads(response),value)[0]
                     if ext_json:
                         extract_data = {key: ext_json}
