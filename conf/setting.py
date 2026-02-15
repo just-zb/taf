@@ -14,4 +14,5 @@ API_TIMEOUT = 60
 FILE_PATH = {
     'LOG': DIR_BASE/ 'logs',
     'CONFIG': DIR_BASE / 'conf/config.ini',
+    'EXTRACT': DIR_BASE / 'extract.yaml',
 }

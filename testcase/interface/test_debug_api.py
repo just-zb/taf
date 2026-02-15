@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 
 from base.api_util import RequestBase
-from common.read_yaml import get_test_case_yaml
+from common.read_yaml import ReadYaml
 
 TESTCASE_DIR = Path(__file__).parent
 
