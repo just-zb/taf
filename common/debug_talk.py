@@ -1,0 +1,2 @@
+class DebugTalk:
+    pass

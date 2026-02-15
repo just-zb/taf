@@ -1,7 +1,10 @@
+import json
+
 from common.assertions import Assertions
+from common.debug_talk import DebugTalk
 from common.read_yaml import ReadYaml
 from common.send_request import SendRequest
-from conf.operConfig import OperConfig
+from conf.oper_config import OperConfig
 
 
 class RequestBase:
@@ -11,8 +14,42 @@ class RequestBase:
         self.run = SendRequest()
         self.asserts = Assertions()
 
-    # TODO
-    def replace_load(self, data):
+    @classmethod
+    def replace_load(cls, data):
+        """
+        查找yaml文件中的${}，解析函数并替换数据
+        :param data: 解析后的数据，可能是字符串，也可能是字典
+        :return: 替换后的数据
+        """
+        str_data = data
+        if not isinstance(data, str):
+            # 把json转为字符串
+            str_data = json.dumps(data, ensure_ascii=False)
+        for i in range(str_data.count('${')):
+            if '${' in str_data and '}' in str_data:
+                start_index = str_data.index('$')
+                end_index = str_data.index('}', start_index)
+                ref_all_params = str_data[start_index:end_index + 1]
+
+                # get function name in ${}
+                func_name = ref_all_params[2:ref_all_params.index("(")]
+                # get function params in ${}
+                func_params = ref_all_params[ref_all_params.index("(") + 1:ref_all_params.index(")")]
+
+                extract_data = getattr(DebugTalk(), func_name)(*func_params.split(',') if func_params else "")
+                if extract_data and isinstance(extract_data, list):
+                    extract_data = ','.join(e for e in extract_data)
+
+                str_data = str_data.replace(ref_all_params, str(extract_data))
+                print('通过解析后替换的数据：', str_data)
+
+        # 还原数据
+        if data and isinstance(data, dict):
+            # 如果是header,data格式为字典
+            data = json.loads(str_data)
+        else:
+            # 如果是字符串
+            data = str_data
         return data
 
     def specification_yaml(self, base_info, test_case):
@@ -39,7 +76,9 @@ class RequestBase:
 
             # test_case 是一个字典，包含了名称,数据,验证方法等信息
             case_name = test_case.pop('case_name')
+
             # 替换yaml文件中的参数，可能包含请求参数、验证方法、提取数据等参数
+            # TODO add validation
             # test_case['validation'] = self.replace_load(test_case.get('validation'))
             # validation = eval(test_case.pop('validation'))
             test_case.pop('validation')
