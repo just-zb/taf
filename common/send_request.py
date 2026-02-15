@@ -17,6 +17,7 @@ class SendRequest:
     def post(self,url,header,data):
         pass
 
+
     def request(self, **kwargs):
         session = requests.session()
         result = None
@@ -28,7 +29,7 @@ class SendRequest:
                 cookie['Cookie'] = set_cookie
                 # cookie 写入yaml文件供后续使用
                 logs.info("cookie：%s" % cookie)
-            logs.info("接口返回信息：%s" % result.text if result.text else result)
+            # logs.info("接口返回信息：%s" % result.text if result.text else result)
         except requests.exceptions.ConnectionError:
             logs.error("ConnectionError--连接异常")
             pytest.fail("接口请求异常，可能是request的连接数过多或请求速度过快导致程序报错！")
