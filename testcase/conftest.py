@@ -8,6 +8,7 @@
 """
 from pathlib import Path
 
+import allure
 import pytest
 
 from base.api_util import RequestBase
@@ -23,7 +24,7 @@ def start_test_and_end():
     yield
     print('-------------接口测试结束--------------')
 
-
+@allure.story("登录")
 @pytest.fixture(scope='session', autouse=True)
 def system_login():
     try:
