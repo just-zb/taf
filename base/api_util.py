@@ -20,8 +20,8 @@ class RequestBase:
         self.run = SendRequest()
         self.asserts = Assertions()
 
-    @classmethod
-    def replace_load(cls, data):
+    @staticmethod
+    def replace_load(data):
         """
         查找yaml文件中的${}，解析函数并替换数据
         :param data: 解析后的数据，可能是字符串，也可能是字典
@@ -131,6 +131,7 @@ class RequestBase:
         except Exception as e:
             raise e
 
+# TODO 重点关注提取参数的逻辑
     def extract_data(self, test_case_extract, response):
         """
         提取接口的响应参数,支持正则表达式和json提取, 提取的数据会写入extract.yaml文件中，供后续接口调用
@@ -165,5 +166,30 @@ class RequestBase:
         except Exception as e:
             logs.error(str(e))
             raise e
-    def extract_data_list(self, testcase_extract_list, response):
-        pass
+    def extract_data_list(self, testcase_extract_list : dict, response: str)-> str:
+        """
+        提取多个参数，支持正则表达式和json提取，提取结果以列表形式返回
+        :param testcase_extract_list: yaml文件中的extract_list信息
+        :param response: 接口的实际返回值,str类型
+        :return:
+        """
+        try:
+            for k,v in testcase_extract_list.items():
+                if "(.+?)" in v or "(.*?)" in v:
+                    ext_list = re.findall(v, response, re.S)
+                    if ext_list:
+                        extract_data = {k: ext_list}
+                        logs.info('提取接口的返回值：%s' % extract_data)
+                        self.read.write_extract_yaml(extract_data)
+                if "$" in v:
+                    # 增加提取判断，有些返回结果为空提取不到，给一个默认值
+                    ext_json = jsonpath.jsonpath(json.loads(response),v)
+                    if ext_json:
+                        extract_data = {k: ext_json}
+                    else:
+                        extract_data = {k: "未提取到数据，该接口返回结果可能为空"}
+                    logs.info("json提取到参数：%s" % extract_data)
+                    self.read.write_extract_yaml(extract_data)
+        except Exception as e:
+            logs.error('接口返回值提取异常，请检查yaml文件extract_list表达式是否正确！')
+
