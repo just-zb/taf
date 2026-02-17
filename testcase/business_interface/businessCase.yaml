@@ -15,7 +15,7 @@
       validation:
         - contains: { 'error_code': '0000' }
       extract_list:
-        goodsIds: $.goodsList[*].goodsId
+        goodsIds: $.goodsList[*].goodsId # 提取商品列表中的所有goodsId，并存储在变量goodsIds中，供后续用例使用
 - baseInfo:
     api_name: 商品详情
     url: /coupApply/cms/productDetail
@@ -25,7 +25,7 @@
   testCase:
     - case_name: 获取商品详情
       json:
-        pro_id: ${get_extract_data(goodsIds,1)}
+        pro_id: ${get_extract_data(goodsIds,1)} # 从变量goodsIds中提取第一个商品的goodsId，作为pro_id参数值
         page: 1
         size: 20
       validation:
@@ -39,7 +39,7 @@
   testCase:
     - case_name: 详情页面选择规格，提交订单
       json:
-        goods_id: ${get_extract_data(goodsIds,1)}
+        goods_id: ${get_extract_data(goodsIds,1)} # 提交订单时，继续使用第一个商品的goodsId作为goods_id参数值
         number: 2
         propertyChildIds: "2:9"
         inviter_id: 127839112

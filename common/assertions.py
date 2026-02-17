@@ -1,3 +1,5 @@
+import operator
+
 import allure
 import jsonpath
 
@@ -34,12 +36,48 @@ class Assertions:
         return flag
 
     @staticmethod
-    def equals_assert(value, response):
-        return 0
+    def equals_assert(expected_results, actual_results):
+        flag =0
+        if isinstance(expected_results, dict) and isinstance(actual_results, dict):
+            # 找出实际结果与预期结果共同的key
+            common_keys = list(expected_results.keys() & actual_results.keys())[0]
+            # 根据相同的key去实际结果中获取，并重新生成一个实际结果的字典
+            new_actual_results = {common_keys: actual_results[common_keys]}
+            eq_assert = operator.eq(new_actual_results, expected_results)
+            if eq_assert:
+                logs.info(f"相等断言成功：接口实际结果：{new_actual_results}，等于预期结果：" + str(expected_results))
+                allure.attach(f"预期结果：{str(expected_results)}\n实际结果：{new_actual_results}", '相等断言结果：成功',
+                              attachment_type=allure.attachment_type.TEXT)
+            else:
+                flag += 1
+                logs.error(f"相等断言失败：接口实际结果{new_actual_results}，不等于预期结果：" + str(expected_results))
+                allure.attach(f"预期结果：{str(expected_results)}\n实际结果：{new_actual_results}", '相等断言结果：失败',
+                              attachment_type=allure.attachment_type.TEXT)
+        else:
+            raise TypeError('相等断言--类型错误，预期结果和接口实际响应结果必须为字典类型！')
+        return flag
 
     @staticmethod
-    def not_equals_assert(value, response):
-        return 0
+    def not_equals_assert(actual_results, expected_results):
+        flag = 0
+        if isinstance(actual_results, dict) and isinstance(expected_results, dict):
+            # 找出实际结果与预期结果共同的key
+            common_keys = list(expected_results.keys() & actual_results.keys())[0]
+            # 根据相同的key去实际结果中获取，并重新生成一个实际结果的字典
+            new_actual_results = {common_keys: actual_results[common_keys]}
+            eq_assert = operator.ne(new_actual_results, expected_results)
+            if eq_assert:
+                logs.info(f"不相等断言成功：接口实际结果：{new_actual_results}，不等于预期结果：" + str(expected_results))
+                allure.attach(f"预期结果：{str(expected_results)}\n实际结果：{new_actual_results}", '不相等断言结果：成功',
+                              attachment_type=allure.attachment_type.TEXT)
+            else:
+                flag += 1
+                logs.error(f"不相等断言失败：接口实际结果{new_actual_results}，等于预期结果：" + str(expected_results))
+                allure.attach(f"预期结果：{str(expected_results)}\n实际结果：{new_actual_results}", '不相等断言结果：失败',
+                              attachment_type=allure.attachment_type.TEXT)
+        else:
+            raise TypeError('不相等断言--类型错误，预期结果和接口实际响应结果必须为字典类型！')
+        return flag
 
     def assert_result(self, expected, response, status_code):
         try:
